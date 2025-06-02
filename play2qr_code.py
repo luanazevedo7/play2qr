@@ -1,25 +1,39 @@
+# -----------------------------------------------------------
+# Play2QR - Sistema de Reprodução de Vídeos via QR Code
+# Autor: Luan Azevedo
+# Versão: Beta
+# -----------------------------------------------------------
+# Descrição:
+# Este programa permite a exibição de vídeos locais através
+# da leitura de QR Codes. O app cria um pequeno servidor
+# local e gera QR Codes para cada vídeo encontrado na pasta
+# "videos". Ao escanear um QR Code, o vídeo correspondente
+# é executado em tela cheia com o VLC Player.
+# -----------------------------------------------------------
+
 import os
 import socket
 import subprocess
 from flask import Flask
 import qrcode
 
-# Inicializa o app Flask
+# Inicializa o app Flask que atuará como servidor web
 app = Flask(__name__)
 
-# Caminhos das pastas
+# Define os caminhos para as pastas de vídeos e QR Codes
 caminho_pasta_videos = os.path.join(os.getcwd(), "videos")
 caminho_pasta_qrcodes = os.path.join(os.getcwd(), "qrcodes")
 
-# Cria pastas se não existirem
+# Garante que as pastas necessárias existam
 os.makedirs(caminho_pasta_videos, exist_ok=True)
 os.makedirs(caminho_pasta_qrcodes, exist_ok=True)
 
 
-# -------------------------------------
-# Retorna um dicionário com os vídeos da pasta
-# Ex: {'cena1': 'videos/cena1.mp4'}
-# -------------------------------------
+# -----------------------------------------------------------
+# Função que retorna um dicionário com os vídeos disponíveis.
+# Exemplo de retorno:
+# {'cena1': 'videos/cena1.mp4'}
+# -----------------------------------------------------------
 def obter_videos_disponiveis():
     dicionario_videos = {}
     for nome_arquivo in os.listdir(caminho_pasta_videos):
@@ -30,22 +44,25 @@ def obter_videos_disponiveis():
     return dicionario_videos
 
 
-# -------------------------------------
-# Obtém o IP local da máquina (ex: 192.168.0.100)
-# -------------------------------------
+# -----------------------------------------------------------
+# Função que descobre o IP local da máquina onde o programa
+# está sendo executado. Este IP é usado para gerar as URLs
+# dos QR Codes.
+# -----------------------------------------------------------
 def descobrir_ip_local():
     soquete = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        soquete.connect(("8.8.8.8", 80))
+        soquete.connect(("8.8.8.8", 80))  # Conecta ao Google DNS
         endereco_ip = soquete.getsockname()[0]
     finally:
         soquete.close()
     return endereco_ip
 
 
-# -------------------------------------
-# Executa o VLC para tocar um vídeo
-# -------------------------------------
+# -----------------------------------------------------------
+# Função responsável por abrir o VLC Media Player em tela cheia
+# e executar o vídeo correspondente.
+# -----------------------------------------------------------
 def executar_video_vlc(caminho_do_video):
     caminho_vlc = r"C:\Program Files\VideoLAN\VLC\vlc.exe"
 
@@ -57,9 +74,10 @@ def executar_video_vlc(caminho_do_video):
     ])
 
 
-# -------------------------------------
-# Rota do Flask que toca o vídeo correspondente
-# -------------------------------------
+# -----------------------------------------------------------
+# Rota principal do Flask: acessa http://<IP>:5000/<id>
+# e executa o vídeo correspondente ao ID.
+# -----------------------------------------------------------
 @app.route('/<string:id_video>')
 def rota_tocar_video(id_video):
     videos_dict = obter_videos_disponiveis()
@@ -71,9 +89,10 @@ def rota_tocar_video(id_video):
         return "❌ Vídeo não encontrado.", 404
 
 
-# -------------------------------------
-# Gera QR Codes para os vídeos encontrados
-# -------------------------------------
+# -----------------------------------------------------------
+# Função que gera QR Codes para todos os vídeos disponíveis
+# na pasta "videos". Salva os QR Codes na pasta "qrcodes".
+# -----------------------------------------------------------
 def gerar_qrcodes_para_videos(ip_local, porta_http):
     videos_encontrados = obter_videos_disponiveis()
 
@@ -88,9 +107,10 @@ def gerar_qrcodes_para_videos(ip_local, porta_http):
         print(f"✅ QR Code salvo: {caminho_qr}")
 
 
-# -------------------------------------
-# Programa principal
-# -------------------------------------
+# -----------------------------------------------------------
+# Execução principal do programa. Inicia o servidor,
+# gera os QR Codes e exibe as instruções no terminal.
+# -----------------------------------------------------------
 if __name__ == "__main__":
     ip_servidor = descobrir_ip_local()
     porta_servidor = 5000
