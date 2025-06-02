@@ -45,15 +45,15 @@ Criação de documentação e organização para entrega
 
  Exemplo dos QR Codes
 
- Estrutura de pastas para entrega
 
 
 🚀 Como usar:
 
-Execute Play2QR.exe
-
-Escaneie um QR Code com o celular
-
+Como usar:
+1. Instalar o reprodutor de vídeo VLC (instalador na pasta)
+2. Adicione os vídeos na pasta 'vídeos'.
+3. Clique duas vezes em "play2qr.exe" para gerar os Qr Codes.
+4. Pegue os Qr Codes na pasta 'qrcodes'
 O vídeo correspondente será exibido automaticamente
 
 🔗 Link para download da versão Beta (.zip): https://drive.google.com/drive/folders/1YsbgrHo-K4OzuYiWMDm-Se4xdQ1FQoEQ?usp=sharing
